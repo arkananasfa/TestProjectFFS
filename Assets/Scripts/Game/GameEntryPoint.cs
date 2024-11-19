@@ -16,6 +16,9 @@ public class GameEntryPoint : MonoBehaviour
     
     [Inject]
     private GameScreen _gameScreen;
+
+    [Inject] 
+    private ButtonsPanel _buttonsPanel;
     
     private LevelData _levelData;    
         
