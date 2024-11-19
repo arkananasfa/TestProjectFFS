@@ -1,13 +1,28 @@
 using System;
+using UnityEngine;
 
 [Serializable]
 public class LevelData
 {
 
+    public event Action<float> OnCompletePercentChanged;
+
+    public float Percent
+    {
+        get => CompletePercent;
+        set
+        {
+            OnCompletePercentChanged?.Invoke(value);
+            CompletePercent = value;
+        }
+    } 
+    
     public string Word;
     public bool IsOpened;
-    public float CompletePercent;
     public GuessWord[] GuessWords;
+    public float SpentTime;
+    
+    [SerializeField] float CompletePercent;
 
     public LevelData(string word)
     {
@@ -16,17 +31,4 @@ public class LevelData
         CompletePercent = 0;
     }
 
-}
-
-[Serializable]
-public class GuessWord
-{
-    public GameWord GameWord;
-    public bool IsGuessed;
-
-    public GuessWord(GameWord gameWord)
-    {
-        GameWord = gameWord;
-        IsGuessed = false;
-    }
 }

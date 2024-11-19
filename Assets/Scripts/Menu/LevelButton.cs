@@ -49,16 +49,16 @@ public class LevelButton : MonoBehaviour
         _button.enabled = true;
         
         wordText.text = data.Word;
-        if (data.CompletePercent > 99f)
+        if (data.Percent > 99f)
         {
             completeLevelImage.SetActive(true);
             return;
         }
         
-        completePercentText.text = Mathf.RoundToInt(data.CompletePercent) + "%";
+        completePercentText.text = Mathf.RoundToInt(data.Percent) + "%";
         completePercentText.gameObject.SetActive(true);
         
-        medalImage.sprite = medalsSpritesByPercents.First(m => m.Item1 > data.CompletePercent).Item2;
+        medalImage.sprite = medalsSpritesByPercents.First(m => m.Item1 > data.Percent).Item2;
         if (medalImage.sprite == null)
         {
             completePercentText.margin = Vector4.zero;

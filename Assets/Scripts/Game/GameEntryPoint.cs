@@ -5,20 +5,34 @@ using Zenject;
 
 public class GameEntryPoint : MonoBehaviour
 {
+    
+    [SerializeField] private WordsPaper _wordsPaper;
 
     [Inject]
     private GameData _gameData;
+    
+    [Inject]
+    private LoadingUI _loadingUI;
+    
+    [Inject]
+    private GameScreen _gameScreen;
     
     private LevelData _levelData;    
         
     public void Init(LevelData levelData)
     {
+        _loadingUI.gameObject.SetActive(true);
+        _gameScreen.gameObject.SetActive(true);
+        _gameScreen.SetWord(levelData.Word);
+        
         _levelData = levelData;
 
         RemoveDuplicates();
 
         if (levelData.GuessWords == null || levelData.GuessWords.Length == 0)
             SetGuessWords();
+        
+        _wordsPaper.Init(_levelData);
     }
 
     private void RemoveDuplicates()
@@ -29,7 +43,6 @@ public class GameEntryPoint : MonoBehaviour
 
     private void SetGuessWords()
     {
-        //Debug.Log($"CHECKING {_levelData.Word}");
         HashSet<string> words = new HashSet<string>();
 
         string word = _levelData.Word;
@@ -37,8 +50,9 @@ public class GameEntryPoint : MonoBehaviour
             word.GroupBy(c => c).ToDictionary(g => g.Key, g => g.Count());
         
         _levelData.GuessWords = _gameData.GameWords.
-        Where(gw => word != gw.Word && IsContainsAllChars(word1CharCount, gw.Word)).
-        Select(gw => new GuessWord(gw)).
+        Where(gw1 => word != gw1.Word && IsContainsAllChars(word1CharCount, gw1.Word)).
+        Select(gw2 => new GuessWord(gw2)).
+        OrderBy(guessWord => guessWord.GameWord.Word.Length).
         ToArray();
     }
 
@@ -49,7 +63,6 @@ public class GameEntryPoint : MonoBehaviour
         {
             if (!word1CharCount.ContainsKey(kvp.Key) || word1CharCount[kvp.Key] < kvp.Value)
             {
-                //Debug.Log("NO");
                 return false;
             }
         }

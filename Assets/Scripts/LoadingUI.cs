@@ -28,11 +28,10 @@ public class LoadingUI : MonoBehaviour
     {
         int tick = 0;
         string mainText = "Loading";
-        string[] pointsTexts = { ".", "..", "..." };
 
         while (true)
         {
-            loadingText.text = mainText + pointsTexts[tick];
+            loadingText.text = mainText + new string('.', tick+1);
             tick = (tick + 1) % 3;
             yield return new WaitForSeconds(0.2f);
         } 
