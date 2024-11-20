@@ -8,31 +8,42 @@ public class FileProgressManager : IProgressManager
 {
 
     private readonly string levelsPath = Application.persistentDataPath + "/levelsProgress.json";
-    private readonly string resourcesPath = Application.persistentDataPath + "/resources.json";
 
-    private List<LevelData> _levelsProgress;
-    
-    public async Task<List<LevelData>> GetLevelsProgress()
+    private GameSave _gameSave;
+
+    public ObservableValue<int> Coins { get; set; } = 0;
+    public ObservableValue<int> Hints { get; set; } = 0;
+
+    public async Task<GameSave> GetLevelsProgress()
     {
         if (System.IO.File.Exists(levelsPath))
-            _levelsProgress = JsonUtility.FromJson<LevelDataArrayWrapper>(await System.IO.File.ReadAllTextAsync(levelsPath));
+            _gameSave = JsonUtility.FromJson<GameSave>(await System.IO.File.ReadAllTextAsync(levelsPath));
         
-        if (_levelsProgress == null)
-            _levelsProgress = new();
+        if (_gameSave == null)
+            _gameSave = new();
+
+        Coins.Value = _gameSave.Coins;
+        Hints.Value = _gameSave.Hints;
         
-        return _levelsProgress;
+        Coins.OnValueChanged += value => _gameSave.Coins = value; 
+        Hints.OnValueChanged += value => _gameSave.Hints = value; 
+        
+        return _gameSave;
     }
 
     public void SetLevelsProgress(string word, LevelData level)
     {
-        if (_levelsProgress.FirstOrDefault(lp => lp.Word == word) == null)
-            _levelsProgress.Add(level);
+        if (_gameSave.Levels.FirstOrDefault(lp => lp.Word == word) == null)
+        {
+            List<LevelData> levels =_gameSave.Levels.ToList();
+            levels.Add(level);
+            _gameSave.Levels = levels.ToArray();
+        }
     }
 
     public async Task SaveLevelsProgress()
     {
-        LevelDataArrayWrapper wrapper = _levelsProgress;
-        await System.IO.File.WriteAllTextAsync(levelsPath, JsonUtility.ToJson(wrapper));
+        await System.IO.File.WriteAllTextAsync(levelsPath, JsonUtility.ToJson(_gameSave));
     }
     
     [Serializable]

@@ -22,13 +22,13 @@ public class MenuEntryPoint : MonoBehaviour
     [Inject]
     private async void Init(GameData gameData)
     {
-        List<LevelData> levelsProgress = await _progressManager.GetLevelsProgress();
+        GameSave gameSave = await _progressManager.GetLevelsProgress();
         List<LevelData> levels = gameData.Levels
-            .Select(w => levelsProgress.FirstOrDefault(lp => lp.Word == w) ?? new LevelData(w)).ToList();
+            .Select(w => gameSave.Levels.FirstOrDefault(lp => lp.Word == w) ?? new LevelData(w)).ToList();
         levels.ForEach(l => _progressManager.SetLevelsProgress(l.Word, l));
         
         _levelsMenu.Init(levels.ToArray(), _container);
-        
+        _levelsMenu.gameObject.SetActive(true);
         _loadingUI.gameObject.SetActive(false);
     }
 

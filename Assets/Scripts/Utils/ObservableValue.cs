@@ -5,7 +5,7 @@ public class ObservableValue<T>
 
     public event Action<T> OnValueChanged;
 
-    private T Value
+    public T Value
     {
         get => _value;
         set

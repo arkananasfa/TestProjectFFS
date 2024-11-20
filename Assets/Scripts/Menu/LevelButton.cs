@@ -22,6 +22,8 @@ public class LevelButton : MonoBehaviour
 
     [Inject]
     private GameEntryPoint _gameStarter;
+    [Inject]
+    private GameScreen _gameScreen;
 
     private LevelData _data;
     
@@ -95,6 +97,13 @@ public class LevelButton : MonoBehaviour
     private void StartLevel()
     {
         _gameStarter.Init(_data);
+        _gameScreen.OnClosed += UpdateProgress;
+    }
+
+    private void UpdateProgress()
+    {
+        Init(_data);
+        _gameScreen.OnClosed -= UpdateProgress;
     }
 
     private void ShowOpenLevelPopup()

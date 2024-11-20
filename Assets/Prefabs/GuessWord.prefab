@@ -101,7 +101,7 @@ MonoBehaviour:
   m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 55
-  m_fontStyle: 16
+  m_fontStyle: 17
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -196,6 +196,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   wordText: {fileID: 519144569681794429}
+  maxScaleSize: 2
+  duration: 1
+  correctColor: {r: 0, g: 0.4811321, b: 0, a: 1}
+  incorrectColor: {r: 0.6509434, g: 0, b: 0, a: 1}
 --- !u!1 &3832950347789660919
 GameObject:
   m_ObjectHideFlags: 0

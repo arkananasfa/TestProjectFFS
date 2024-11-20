@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 using Zenject;
 
 public class WordsPaper : MonoBehaviour
 {
 
+    [SerializeField] private ScrollRect scrollRect;
     [SerializeField] private GameWordButton gameWordPrefab;
     [SerializeField] private Transform gameWordsContainer;
  
@@ -27,6 +29,8 @@ public class WordsPaper : MonoBehaviour
     private GameScreen _gameScreen;
 
     private Sequence _appearSequence;
+
+    private Dictionary<string, GameWordButton> gameWordsByWords = new();
     
     private void Awake()
     {
@@ -54,6 +58,7 @@ public class WordsPaper : MonoBehaviour
     
     public void Init(LevelData levelData)
     {
+        gameWordsByWords.Clear();
         int i = 0;
         foreach (var word in levelData.GuessWords)
         {
@@ -61,12 +66,14 @@ public class WordsPaper : MonoBehaviour
             {
                 gameWords[i].gameObject.SetActive(true);
                 gameWords[i].Init(word);
+                gameWordsByWords.Add(word.GameWord.Word, gameWords[i]);
             }
             else
             {
                 var gameWord = _container.InstantiatePrefab(gameWordPrefab, gameWordsContainer).GetComponent<GameWordButton>();
                 gameWord.Init(word);
                 gameWords.Add(gameWord);
+                gameWordsByWords.Add(word.GameWord.Word, gameWord);
             }
             i++;
         }
@@ -79,10 +86,31 @@ public class WordsPaper : MonoBehaviour
         _appearSequence.Restart();
     }
 
+    public bool TryGuessWord(string word)
+    {
+        if (gameWordsByWords.ContainsKey(word))
+        {
+            var button = gameWordsByWords[word];
+            button.Guess();
+            SetScrollToElement(button.GetComponent<RectTransform>());
+            return true;
+        }
+
+        return false;
+    }
+
     private void BackToStartPosition()
     {
         transform.position = startPoint.position;
         transform.rotation = startPoint.rotation;
+    }
+
+    private void SetScrollToElement(RectTransform element)
+    {
+        float contentHeight = scrollRect.content.rect.height - scrollRect.viewport.rect.height;
+        float elementY = -element.anchoredPosition.y;
+        float newNormalizedPositionY = 1 - Mathf.Clamp01((elementY-element.rect.height/2f-47) / contentHeight);
+        scrollRect.verticalNormalizedPosition = newNormalizedPositionY;
     }
 
     [Serializable]

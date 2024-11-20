@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 
 [Serializable]
@@ -9,26 +10,26 @@ public class LevelData
 
     public float Percent
     {
-        get => CompletePercent;
-        set
+        get
         {
-            OnCompletePercentChanged?.Invoke(value);
-            CompletePercent = value;
+            if (GuessWords != null && GuessWords.Length > 0)
+                return (float)GuessedCount / WordsCount * 100f;
+            return 0f;
         }
-    } 
+    }
+
+    public int WordsCount => GuessWords.Length;
+    public int GuessedCount => GuessWords.Count(gw => gw.IsGuessed);
     
     public string Word;
     public bool IsOpened;
     public GuessWord[] GuessWords;
-    public float SpentTime;
-    
-    [SerializeField] float CompletePercent;
+    public float SpentTimeSeconds;
 
     public LevelData(string word)
     {
         Word = word;
         IsOpened = false;
-        CompletePercent = 0;
     }
 
 }

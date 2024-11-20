@@ -2,6 +2,7 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 public class WordInfoPopup : MonoBehaviour
 {
@@ -17,6 +18,9 @@ public class WordInfoPopup : MonoBehaviour
     [SerializeField] private Button closeButton;
     [SerializeField] private Button okButton;
     [SerializeField] private Button hintButton;
+    
+    [Inject(Id = "Hints")] 
+    private ObservableValue<int> _hintsObservableValue;
     
     private GuessWord _gameWord;
 
@@ -50,36 +54,38 @@ public class WordInfoPopup : MonoBehaviour
     private void SetGuessedState()
     {
         wordText.text = _gameWord.GameWord.Word;
-        SetDescription();
+        SetDescription(true);
         SetHintCanBeUsed(false);
     }
 
     private void SetHiddenState()
     {
         wordText.text = new string(_gameWord.IsHintUsed ? '+' : '-', _gameWord.GameWord.Word.Length);
+        SetDescription(_gameWord.IsHintUsed);
         SetHintCanBeUsed(!_gameWord.IsHintUsed);
     }
 
     private void ShowHint()
     {
+        _hintsObservableValue.Value--;
         _gameWord.IsHintUsed = true;
         OnHintUsed?.Invoke();
         wordText.text = new string('+', _gameWord.GameWord.Word.Length);
-        SetDescription();
+        SetDescription(true);
         SetHintCanBeUsed(false);
     }
 
     private void SetHintCanBeUsed(bool canBeUsed)
     {
         okButton.gameObject.SetActive(!canBeUsed);
-        hintButton.gameObject.SetActive(canBeUsed);
+        hintButton.gameObject.SetActive(canBeUsed && _hintsObservableValue.Value > 0);
     }
 
-    private void SetDescription()
+    private void SetDescription(bool isShow)
     {
-        descriptionText.gameObject.SetActive(true);
+        descriptionText.gameObject.SetActive(isShow);
         descriptionText.text = _gameWord.GameWord.Description;
-        hiddenDescriptionImage.gameObject.SetActive(false);
+        hiddenDescriptionImage.gameObject.SetActive(!isShow);
     }
     
     private void ClosePopup()

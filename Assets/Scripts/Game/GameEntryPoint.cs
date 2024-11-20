@@ -1,12 +1,17 @@
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Zenject;
 
 public class GameEntryPoint : MonoBehaviour
 {
     
-    [SerializeField] private WordsPaper _wordsPaper;
+    [SerializeField] private Timer timer;
+    
+    [Inject]
+    private WordsPaper _wordsPaper;
 
     [Inject]
     private GameData _gameData;
@@ -19,6 +24,9 @@ public class GameEntryPoint : MonoBehaviour
 
     [Inject] 
     private ButtonsPanel _buttonsPanel;
+    
+    [Inject]
+    private WordsCountText _wordsCountText;
     
     private LevelData _levelData;    
         
@@ -34,8 +42,11 @@ public class GameEntryPoint : MonoBehaviour
 
         if (levelData.GuessWords == null || levelData.GuessWords.Length == 0)
             SetGuessWords();
-        
+
+        _wordsCountText.Init(_levelData.WordsCount, _levelData.GuessedCount);
+        _buttonsPanel.Init(GetWordsLetter(levelData.Word));
         _wordsPaper.Init(_levelData);
+        timer.Init(_levelData);
     }
 
     private void RemoveDuplicates()
@@ -71,6 +82,14 @@ public class GameEntryPoint : MonoBehaviour
         }
 
         return true;
+    }
+
+    private List<string> GetWordsLetter(string word)
+    {
+        List<string> letters = new List<string>();
+        for (int i = 0; i < word.Length; i++)
+            letters.Add(word[i].ToString());
+        return letters;
     }
     
 }
